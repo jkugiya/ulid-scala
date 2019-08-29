@@ -16,37 +16,21 @@ object ULID {
 
   private[ulid] val ByteLengthOfLong = 8
 
-  private[ulid] final class StatefulGenerator (random: JRandom) extends ULIDGenerator {
+  private[ulid] final class StatefulGenerator(random: JRandom) extends ULIDGenerator {
 
-    def generate(): ULID = {
-      val randomness = new Array[Byte](RandomnessSize)
-      random.nextBytes(randomness)
-      new ULID(System.currentTimeMillis(), randomness)
-    }
+    def generate(): ULID =
+      new ULID(System.currentTimeMillis(), random)
 
-  }
-
-  private[ulid] final class StatelessGenerator(time: Long, seed: Long, random: JRandom) extends ULIDGenerator {
-
-    def generate(): ULID = {
-      random.setSeed(seed)
-      val randomness = new Array[Byte](RandomnessSize)
-      random.nextBytes(randomness)
-      new ULID(time, randomness)
-    }
   }
 
   private[this] def secureGenerator = {
     Try(SecureRandom.getInstance("NativePRNGNonBlocking"))
-      .recover({ case _ => SecureRandom.getInstanceStrong})
+      .recover({ case _ => SecureRandom.getInstanceStrong })
       .get
   }
 
   def getGenerator(random: JRandom = secureGenerator): ULIDGenerator =
     new StatefulGenerator(random)
-
-  def getStatelessGenerator(time: Long, seed: Long, random: JRandom = new java.util.Random()): ULIDGenerator =
-    new StatelessGenerator(time, seed, random)
 
 }
 
@@ -74,7 +58,16 @@ object ULIDEncoder {
   implicit val uuidEncoder: ULIDEncoder[UUID] = new UUIDEncoder
 }
 
-private [ulid] class ULID (val time: Long, private[ulid] val originalEntropy: Array[Byte]) {
+private[ulid] class ULID private(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
+
+  def this(time: Long, random: JRandom) = {
+    this(
+      time, {
+        val randomness = new Array[Byte](RandomnessSize)
+        random.nextBytes(randomness)
+        randomness
+      })
+  }
 
   def binary: Array[Byte] = {
     val buffer = ByteBuffer.allocate(ByteLengthOfULID)
@@ -83,13 +76,13 @@ private [ulid] class ULID (val time: Long, private[ulid] val originalEntropy: Ar
         .allocate(ByteLengthOfLong).putLong(time).array()
         .drop(2) // (64bit(long) - 48bit(timestamp length of ULID)) = 16bit = 2byte
     buffer.put(timeArray)
-    buffer.put(originalEntropy)
+    buffer.put(originalRandomness)
     buffer.array()
   }
 
   def randomness: Array[Byte] = {
     val value = new Array[Byte](RandomnessSize)
-    originalEntropy.copyToArray(value)
+    originalRandomness.copyToArray(value)
     value
   }
 }

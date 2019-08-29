@@ -11,6 +11,7 @@ private[ulid] class Base32Encoder extends ULIDEncoder[String] {
 
   override def encode(ulid: ULID): String = {
     val binary = ulid.binary
+    // [(empty 2bit) ++ (48bit timestamp + 80bit randomness): 130bit data] -(grouped by 5bit)-> toBase32
     (Stream(0, 0) ++ (0 to 127).toStream.map { i =>
       val bitValueOfI = (binary(i / 8) << (i % 8)) & 0x80
       if (bitValueOfI == 0) 0
