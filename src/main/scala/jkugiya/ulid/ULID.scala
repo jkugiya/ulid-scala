@@ -58,7 +58,7 @@ object ULIDEncoder {
   implicit val uuidEncoder: ULIDEncoder[UUID] = new UUIDEncoder
 }
 
-private[ulid] class ULID private(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
+private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
 
   def this(time: Long, random: JRandom) = {
     this(
