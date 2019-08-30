@@ -18,14 +18,20 @@ object ULID {
 
   private[ulid] final class StatefulGenerator(random: JRandom) extends ULIDGenerator {
 
-    def generate(): ULID =
+    override final def generate(): ULID =
       new ULID(System.currentTimeMillis(), random)
+
+    override final def algorithm: String = random match {
+      case sr: SecureRandom => sr.getAlgorithm
+      case _ => random.getClass.toString
+    }
 
   }
 
   private[this] def secureGenerator = {
     Try(SecureRandom.getInstance("NativePRNGNonBlocking"))
       .recover({ case _ => SecureRandom.getInstanceStrong })
+      .recover({ case _ => new JRandom() })
       .get
   }
 
@@ -43,6 +49,8 @@ private[ulid] trait ULIDGenerator {
 
   final def uuid(): UUID =
     UUIDEncoder.encode(generate())
+
+  def algorithm(): String
 
 }
 
