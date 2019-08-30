@@ -12,6 +12,7 @@ private[ulid] class Base32Encoder extends ULIDEncoder[String] {
   )
   val MaskForTake5 = 0xf800000000000000L
   override def encode(ulid: ULID): String = {
+    // convert 130bits(empty 2bits + 128bit) to base32 26 characters
     val binary = ulid.binary // len = 16
     val chars = new Array[Char](26)
     val mostSigBits = ByteBuffer.wrap(binary.slice(0, 8)).getLong
@@ -37,28 +38,6 @@ private[ulid] class Base32Encoder extends ULIDEncoder[String] {
       chars(i) = toBase32(((thirdBits << (i - 24) * 5 & MaskForTake5) >>> 59).toInt)
       i += 1
     }
-    val bitResult = chars.mkString
-    // [(empty 2bit) ++ (48bit timestamp + 80bit randomness): 130bit data] -(grouped by 5bit)-> toBase32
-    val streamResult =
-    (Stream(0, 0) ++ (0 to 127).toStream.map { i =>
-      val bitValueOfI = (binary(i / 8) << (i % 8)) & 0x80
-      if (bitValueOfI == 0) 0
-      else 1
-    }).grouped(5).map { buffer =>
-      val bit5 = buffer.toArray
-      val index =
-        (bit5(0) << 4) +
-          (bit5(1) << 3) +
-          (bit5(2) << 2) +
-          (bit5(3) << 1) +
-          bit5(4)
-      toBase32(index)
-    }.mkString
-    println(
-      s"""
-         |bit   : ${bitResult.take(12).mkString},${bitResult.drop(12).take(12).mkString},${bitResult.drop(24).mkString}
-         |stream: ${streamResult.take(12).mkString},${streamResult.drop(12).take(12).mkString},${streamResult.drop(24).mkString}
-         |""".stripMargin)
-    streamResult
+    new String(chars)
   }
 }
