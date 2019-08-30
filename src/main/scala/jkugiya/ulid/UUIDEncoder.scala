@@ -3,7 +3,7 @@ package jkugiya.ulid
 import java.nio.ByteBuffer
 import java.util.UUID
 
-class UUIDEncoder extends ULIDEncoder[UUID] {
+private[ulid] object UUIDEncoder extends ULIDEncoder[UUID] {
 
   override def encode(ulid: ULID): UUID = {
     val binary = ulid.binary
@@ -13,3 +13,4 @@ class UUIDEncoder extends ULIDEncoder[UUID] {
   }
 
 }
+

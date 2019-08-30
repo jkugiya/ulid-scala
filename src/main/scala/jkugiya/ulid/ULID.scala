@@ -34,28 +34,20 @@ object ULID {
 
 }
 
-trait ULIDGenerator {
+private[ulid] trait ULIDGenerator {
 
   def generate(): ULID
 
-  final def generateValue[A: ULIDEncoder]: A =
-    implicitly[ULIDEncoder[A]].encode(generate())
-
   final def base32(): String =
-    ULIDEncoder.base32Encoder.encode(generate())
+    Base32Encoder.encode(generate())
 
   final def uuid(): UUID =
-    ULIDEncoder.uuidEncoder.encode(generate())
+    UUIDEncoder.encode(generate())
 
 }
 
-trait ULIDEncoder[A] {
+private[ulid] trait ULIDEncoder[A] {
   def encode(ulid: ULID): A
-}
-
-object ULIDEncoder {
-  implicit val base32Encoder: ULIDEncoder[String] = new Base32Encoder
-  implicit val uuidEncoder: ULIDEncoder[UUID] = new UUIDEncoder
 }
 
 private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {

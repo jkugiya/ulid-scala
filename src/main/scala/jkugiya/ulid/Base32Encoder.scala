@@ -2,9 +2,7 @@ package jkugiya.ulid
 
 import java.nio.ByteBuffer
 
-import scala.collection.mutable.ArrayBuffer
-
-private[ulid] class Base32Encoder extends ULIDEncoder[String] {
+private[ulid] object Base32Encoder extends ULIDEncoder[String] {
 
   private val toBase32 = Array(
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -12,7 +10,9 @@ private[ulid] class Base32Encoder extends ULIDEncoder[String] {
     'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X',
     'Y', 'Z'
   )
-  val MaskForTake5 = 0xf800000000000000L
+
+  private val MaskForTake5 = 0xf800000000000000L
+
   override def encode(ulid: ULID): String = {
     // convert 130bits(empty 2bits + 128bit) to base32 26 characters
     val binary = ulid.binary // len = 16
