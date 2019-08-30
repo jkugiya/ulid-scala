@@ -2,6 +2,8 @@ package jkugiya.ulid
 
 import java.nio.ByteBuffer
 
+import scala.collection.mutable.ArrayBuffer
+
 private[ulid] class Base32Encoder extends ULIDEncoder[String] {
 
   private val toBase32 = Array(
@@ -17,26 +19,23 @@ private[ulid] class Base32Encoder extends ULIDEncoder[String] {
     val chars = new Array[Char](26)
     val mostSigBits = ByteBuffer.wrap(binary.slice(0, 8)).getLong
     val leastSigBits = ByteBuffer.wrap(binary.slice(8, 16)).getLong
-    var i = 0
-    // first 60bits(empty 2bits + 58bits)
-    val firstBits = mostSigBits >>> 6 << 4
-    while(i < 12) {
-      chars(i) = toBase32(((firstBits << (i * 5) & MaskForTake5) >>> 59).toInt)
-      i += 1
+    var i = 25
+    // last 60-1bits
+    while(i > 13) {
+      chars(i) = toBase32((leastSigBits >>> ((25 - i) * 5) & 0x1F).toInt)
+      i += -1
     }
-    // second 60bits
-    val secondBits = ((mostSigBits << 58) | (leastSigBits >>> 10 << 4))
-    i = 12
-    while(i < 24) {
-      chars(i) = toBase32(((secondBits << (i - 12) * 5 & MaskForTake5) >>> 59).toInt)
-      i += 1
+    // last 120-60 bits
+    var bitsBuffer = (leastSigBits >>> 60) | (mostSigBits << 4)
+    while(i > 1) {
+      chars(i) = toBase32((bitsBuffer >>> ((13 - i) * 5) & 0x1F).toInt)
+      i += -1
     }
-    // third 10 bits
-    i = 24
-    val thirdBits = leastSigBits << 54
-    while(i < 26) {
-      chars(i) = toBase32(((thirdBits << (i - 24) * 5 & MaskForTake5) >>> 59).toInt)
-      i += 1
+    // first 10 bits(include empty 2bits)
+    bitsBuffer = mostSigBits >>> 56
+    while(i > -1) {
+      chars(i) = toBase32((bitsBuffer >>> ((1 - i) * 5) & 0x1F).toInt)
+      i += -1
     }
     new String(chars)
   }
