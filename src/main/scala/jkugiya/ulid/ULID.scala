@@ -16,6 +16,9 @@ object ULID {
 
   private[ulid] val ByteLengthOfLong = 8
 
+  private[ulid] val MaxTimestamp = 281474976710655L
+  private[ulid] val MinTimestamp = 0L
+
   private[ulid] final class StatefulGenerator(random: JRandom) extends ULIDGenerator {
 
     override final def generate(): ULID =
@@ -59,6 +62,14 @@ private[ulid] trait ULIDEncoder[A] {
 }
 
 private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
+  if (time > MaxTimestamp || time < MinTimestamp) {
+    throw new IllegalArgumentException(s"Invalid timestamp is given.(${time}, should be between ${MinTimestamp} to ${MaxTimestamp}.")
+  }
+  if (originalRandomness.length != 10) {
+    val byteLengh = originalRandomness.length
+    val bitLength = byteLengh * 8
+    throw new IllegalArgumentException(s"randomness should be 80bits(10 byte), but ${bitLength} bits(${byteLengh} byte) randomness is given.")
+  }
 
   def this(time: Long, random: JRandom) = {
     this(
@@ -79,6 +90,10 @@ private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: A
     buffer.put(originalRandomness)
     buffer.array()
   }
+
+  def base32: String = Base32Encoder.encode(this)
+
+  def uuid: UUID = UUIDEncoder.encode(this)
 
   def randomness: Array[Byte] = {
     val value = new Array[Byte](RandomnessSize)
