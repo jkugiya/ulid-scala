@@ -22,7 +22,7 @@ class ULIDTest extends FlatSpec with Matchers {
     ulid(timestamp, Array.fill(10)(-1)).base32.takeRight(16) shouldBe "Z" * 16
   }
   it should "be failed" in {
-    an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp -1, Random.nextBytes(10))
+    an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp - 1, Random.nextBytes(10))
     an[IllegalArgumentException] should be thrownBy ulid(ULID.MaxTimestamp + 1, Random.nextBytes(10))
     an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp, Random.nextBytes(9))
     an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp, Random.nextBytes(11))
