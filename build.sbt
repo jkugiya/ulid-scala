@@ -12,6 +12,16 @@ lazy val root = (project in file("."))
     libraryDependencies += scalaTest % Test
   )
 
+lazy val benchmark = (project in file("benchmark"))
+  .enablePlugins(JmhPlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+      "de.huxhorn.sulky" % "de.huxhorn.sulky.ulid" % "8.2.0",
+      "io.azam.ulidj" % "ulidj" % "1.0.0"
+    )
+  )
+  .dependsOn(root)
+
 // Uncomment the following for publishing to Sonatype.
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for more detail.
 
