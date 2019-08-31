@@ -1,7 +1,5 @@
 package jkugiya.ulid
 
-import java.nio.ByteBuffer
-
 object Base32Encoder extends ULIDEncoder[String] {
 
   private val toBase32 = Array(
@@ -10,8 +8,6 @@ object Base32Encoder extends ULIDEncoder[String] {
     'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X',
     'Y', 'Z'
   )
-
-  private val MaskForTake5 = 0xf800000000000000L
 
   override def encode(ulid: ULID): String = {
     val chars = new Array[Char](26)
