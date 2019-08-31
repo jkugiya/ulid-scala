@@ -47,6 +47,8 @@ private[ulid] trait ULIDGenerator {
 
   def generate(): ULID
 
+  final def binary(): Array[Byte] = generate().binary
+
   final def base32(): String =
     Base32Encoder.encode(generate())
 
@@ -82,11 +84,8 @@ private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: A
 
   def binary: Array[Byte] = {
     val buffer = ByteBuffer.allocate(ByteLengthOfULID)
-    val timeArray =
-      ByteBuffer
-        .allocate(ByteLengthOfLong).putLong(time).array()
-        .drop(2) // (64bit(long) - 48bit(timestamp length of ULID)) = 16bit = 2byte
-    buffer.put(timeArray)
+    buffer.putLong(time << 16) // takes 48bit only
+    buffer.position(6)
     buffer.put(originalRandomness)
     buffer.array()
   }

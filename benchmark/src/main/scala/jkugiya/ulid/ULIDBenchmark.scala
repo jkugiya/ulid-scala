@@ -13,6 +13,10 @@ class ULIDBenchmark {
   val gen = ULID.getGenerator(random)
 
   @Benchmark
+  def binary(): Unit = {
+    gen.binary()
+  }
+  @Benchmark
   def ulid_scala_base32(): Unit = {
     gen.base32()
   }
