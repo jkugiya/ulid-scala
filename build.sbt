@@ -26,7 +26,7 @@ lazy val benchmark = (project in file("benchmark"))
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for more detail.
 
  ThisBuild / description := "A Scala port of alizain/ulid"
- ThisBuild / licenses    := List("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+ ThisBuild / licenses    := List("MIT" -> new URL("https://github.com/jkugiya/ulid-scala/blob/master/LICENSE"))
  ThisBuild / homepage    := Some(url("https://github.com/jkugiya/ulid-scala"))
  ThisBuild / scmInfo := Some(
    ScmInfo(
