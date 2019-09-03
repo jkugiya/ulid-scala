@@ -1,0 +1,20 @@
+language: scala
+scala:
+  - 2.11.11
+  - 2.12.9
+  - 2.13.0
+env:
+  - SBT_VERSION=1.2.8
+jdk:
+  - openjdk8
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache/
+    - $HOME/.sbt/boot/
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION coverage test
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+
