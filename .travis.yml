@@ -18,3 +18,4 @@ script:
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
+after_success: "sbt coverageReport coveralls"
