@@ -1,5 +1,5 @@
 # ULID scala
-
+[![Build Status](https://travis-ci.org/jkugiya/ulid-scala.png?branch=master)](https://travis-ci.org/jkugiya/ulid-scala)
 
 ULID (Universally Unique Lexicographically Sortable Identifier) generator and parser for Scala.
 
