@@ -9,7 +9,7 @@ Refer [alizain/ulid](https://github.com/alizain/ulid) for a more detailed ULID s
 ## Getting Started
 
 ```
-libraryDependencies += "jkugiya" %% "ulid" % "<version>"
+libraryDependencies += "com.github.jkugiya" %% "ulid" % "<version>"
 ```
 
 ## Usage
