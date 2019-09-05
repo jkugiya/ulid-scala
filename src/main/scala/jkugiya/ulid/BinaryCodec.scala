@@ -15,6 +15,9 @@ private[ulid] object BinaryCodec {
   }
 
   def decode(binary: Array[Byte]): ULID = {
+    if (binary.length != 16) {
+      throw new IllegalArgumentException("Binary length should be 16.")
+    }
     val binaryBuffer = ByteBuffer.wrap(binary)
     val m = binaryBuffer.getLong
     val l = binaryBuffer.getLong

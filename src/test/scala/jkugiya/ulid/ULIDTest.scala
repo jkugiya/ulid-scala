@@ -65,4 +65,21 @@ class ULIDTest extends FlatSpec with Matchers {
     val decoded = ULID.fromBinary(binary)
     binary shouldBe(decoded.binary)
   }
+
+  "randomness" should "be copied original" in {
+    val gen = ULID.getGenerator()
+    val uuid = gen.generate()
+    (uuid.originalRandomness zip uuid.randomness).foreach {
+      case (l, r) => l shouldBe(r)
+    }
+  }
+  it should "not decode invalid character" in {
+    an[IllegalArgumentException] should be thrownBy ULID.fromBase32("abc")
+    an[IllegalArgumentException] should be thrownBy ULID.fromBase32("=" * 26)
+  }
+  it should "not decode invalid binary" in {
+    an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](0))
+    an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](15))
+    an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](17))
+  }
 }
