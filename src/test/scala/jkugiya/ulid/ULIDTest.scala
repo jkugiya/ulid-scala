@@ -38,4 +38,22 @@ class ULIDTest extends FlatSpec with Matchers {
     an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp, nextBytes(9))
     an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp, nextBytes(11))
   }
+  "generated Base32" should "be equal to decoded value" in {
+    val gen = ULID.getGenerator()
+    val base32 = gen.base32()
+    val decoded = ULID.fromBase32(base32)
+    base32 shouldBe(decoded.base32)
+  }
+  "generated UUID" should "be equal to decoded value" in {
+    val gen = ULID.getGenerator()
+    val uuid = gen.uuid()
+    val decoded = ULID.fromUUID(uuid)
+    uuid shouldBe(decoded.uuid)
+  }
+  "generated binary" should "be equal to decoded value" in {
+    val gen = ULID.getGenerator()
+    val binary = gen.binary()
+    val decoded = ULID.fromBinary(binary)
+    binary shouldBe(decoded.binary)
+  }
 }

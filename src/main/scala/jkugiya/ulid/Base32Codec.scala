@@ -1,6 +1,8 @@
 package jkugiya.ulid
 
-object Base32Encoder extends ULIDEncoder[String] {
+import java.nio.ByteBuffer
+
+private[ulid] object Base32Codec {
 
   private val toBase32 = Array(
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -9,7 +11,7 @@ object Base32Encoder extends ULIDEncoder[String] {
     'Y', 'Z'
   )
 
-  override def encode(ulid: ULID): String = {
+  def encode(ulid: ULID): String = {
     val chars = new Array[Char](26)
     // timestamp(10byte)
     // take last 5bit
@@ -44,5 +46,41 @@ object Base32Encoder extends ULIDEncoder[String] {
     chars(24) = toBase32(((randomness(8) << 3) | (randomness(9) >>> 5)) & 0x1F)
     chars(25) = toBase32(randomness(9) & 0x1F)
     new String(chars)
+  }
+
+  def decode(base32: String): ULID = {
+    if (base32.length != 26) {
+      throw new IllegalArgumentException("The length of Base32 string should be 26")
+    }
+    val chars = base32.toCharArray
+    var i = 0
+    var time = 0L
+    var next40 = 0L
+    var last40 = 0L
+    def bit = {
+      val bit = toBase32.indexOf(chars(i))
+      if (bit < 0) {
+        throw new IllegalArgumentException(s"Given string contains invalid character. (${chars(i)})")
+      }
+      bit
+    }
+    while(i < 10) {
+      time = (time << 5) | bit
+      i += 1
+    }
+    while (i < 18) {
+      next40 = (next40 << 5) | bit
+      i += 1
+    }
+    while(i < 26) {
+      last40 = (last40 << 5) | bit
+      i += 1
+    }
+    val first64 = next40 << 24 | (last40 >>> 16)
+    val last16: Short = (last40 & 0xFFFF).toShort
+    val buffer = ByteBuffer.allocate(10)
+    buffer.putLong(first64).putShort(last16)
+    val ulid = new ULID(time, buffer.array())
+    ulid
   }
 }
