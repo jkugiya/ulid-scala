@@ -37,3 +37,9 @@ val binary: Array[Byte] = generator.binary()
 
 ## LICENSE
 [LICENSE](https://github.com/jkugiya/ulid-scala/blob/master/LICENSE)
+
+## Prior Arts
+- [azam/ulidj](https://github.com/azam/ulidj)
+- [sulky-ulid](https://github.com/huxi/sulky/tree/master/sulky-ulid)
+- [ulid4s](https://github.com/petitviolet/ulid4s)
+
