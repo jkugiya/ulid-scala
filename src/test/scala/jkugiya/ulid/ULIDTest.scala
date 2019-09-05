@@ -30,7 +30,16 @@ class ULIDTest extends FlatSpec with Matchers {
   "last 80bit" should "be generated from randomness" in {
     val timestamp = nextLong()
     ulid(timestamp, Array.fill(10)(0)).base32.takeRight(16) shouldBe "0" * 16
-    ulid(timestamp, Array.fill(10)(-1)).base32.takeRight(16) shouldBe "Z" * 16
+    ulid(timestamp, Array.fill(10)(255.toByte)).base32.takeRight(16) shouldBe "Z" * 16
+  }
+  "base32" should "be equal to another implementation" in {
+    (1 to 100).foreach { _ =>
+      val timestamp = System.currentTimeMillis()
+      val randomness = nextBytes()
+      val base32 = ulid(timestamp, randomness).base32
+      (Base32Logics.logic2(timestamp, randomness) shouldBe (Base32Logics.logic1(timestamp, randomness)))
+      base32 shouldBe (Base32Logics.logic2(timestamp, randomness))
+    }
   }
   it should "be failed" in {
     an[IllegalArgumentException] should be thrownBy ulid(ULID.MinTimestamp - 1, nextBytes())
