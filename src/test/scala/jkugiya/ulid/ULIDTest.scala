@@ -37,7 +37,7 @@ class ULIDTest extends FlatSpec with Matchers {
       val timestamp = System.currentTimeMillis()
       val randomness = nextBytes()
       val base32 = ulid(timestamp, randomness).base32
-      (Base32Logics.logic2(timestamp, randomness) shouldBe (Base32Logics.logic1(timestamp, randomness)))
+      base32 shouldBe (Base32Logics.logic1(timestamp, randomness))
       base32 shouldBe (Base32Logics.logic2(timestamp, randomness))
     }
   }
