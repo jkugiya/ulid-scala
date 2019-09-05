@@ -1,6 +1,5 @@
 package jkugiya.ulid
 
-import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.{ UUID, Random => JRandom }
 
@@ -41,26 +40,32 @@ object ULID {
   def getGenerator(random: JRandom = secureGenerator): ULIDGenerator =
     new StatefulGenerator(random)
 
+  def fromBase32(base32: String): ULID =
+    Base32Codec.decode(base32)
+
+  def fromUUID(uuid: UUID): ULID =
+    UUIDCodec.decode(uuid)
+
+  def fromBinary(binary: Array[Byte]): ULID =
+    BinaryCodec.decode(binary)
+
 }
 
 private[ulid] trait ULIDGenerator {
 
   def generate(): ULID
 
-  final def binary(): Array[Byte] = generate().binary
+  final def binary(): Array[Byte] =
+    BinaryCodec.encode(generate())
 
   final def base32(): String =
-    Base32Encoder.encode(generate())
+    Base32Codec.encode(generate())
 
   final def uuid(): UUID =
-    UUIDEncoder.encode(generate())
+    UUIDCodec.encode(generate())
 
   def algorithm(): String
 
-}
-
-private[ulid] trait ULIDEncoder[A] {
-  def encode(ulid: ULID): A
 }
 
 private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
@@ -68,9 +73,9 @@ private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: A
     throw new IllegalArgumentException(s"Invalid timestamp is given.(${time}, should be between ${MinTimestamp} to ${MaxTimestamp}.")
   }
   if (originalRandomness.length != 10) {
-    val byteLengh = originalRandomness.length
-    val bitLength = byteLengh * 8
-    throw new IllegalArgumentException(s"randomness should be 80bits(10 byte), but ${bitLength} bits(${byteLengh} byte) randomness is given.")
+    val byteLength = originalRandomness.length
+    val bitLength = byteLength * 8
+    throw new IllegalArgumentException(s"randomness should be 80bits(10 byte), but ${bitLength} bits(${byteLength} byte) randomness is given.")
   }
 
   def this(time: Long, random: JRandom) = {
@@ -82,17 +87,11 @@ private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: A
       })
   }
 
-  def binary: Array[Byte] = {
-    val buffer = ByteBuffer.allocate(ByteLengthOfULID)
-    buffer.putLong(time << 16) // takes 48bit only
-    buffer.position(6)
-    buffer.put(originalRandomness)
-    buffer.array()
-  }
+  def binary: Array[Byte] = BinaryCodec.encode(this)
 
-  def base32: String = Base32Encoder.encode(this)
+  def base32: String = Base32Codec.encode(this)
 
-  def uuid: UUID = UUIDEncoder.encode(this)
+  def uuid: UUID = UUIDCodec.encode(this)
 
   def randomness: Array[Byte] = {
     val value = new Array[Byte](RandomnessSize)
