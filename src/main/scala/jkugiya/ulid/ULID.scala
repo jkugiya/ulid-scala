@@ -1,7 +1,7 @@
 package jkugiya.ulid
 
 import java.security.SecureRandom
-import java.util.{ UUID, Random => JRandom }
+import java.util.{UUID, Random => JRandom}
 
 import jkugiya.ulid.ULID._
 
@@ -68,7 +68,7 @@ private[ulid] trait ULIDGenerator {
 
 }
 
-private[ulid] class ULID(val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
+class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: Array[Byte]) {
   if (time > MaxTimestamp || time < MinTimestamp) {
     throw new IllegalArgumentException(s"Invalid timestamp is given.(${time}, should be between ${MinTimestamp} to ${MaxTimestamp}.")
   }
