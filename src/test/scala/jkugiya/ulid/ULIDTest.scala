@@ -1,8 +1,9 @@
 package jkugiya.ulid
 
 
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.{FlatSpec, Matchers}
 
+import java.util.UUID
 import scala.util.Random
 
 class ULIDTest extends FlatSpec with Matchers {
@@ -81,5 +82,11 @@ class ULIDTest extends FlatSpec with Matchers {
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](0))
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](15))
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](17))
+  }
+  it should "support equals" in {
+    val uuid = UUID.randomUUID()
+    val u1 = ULID.fromUUID(uuid)
+    val u2 = ULID.fromUUID(uuid)
+    u1 should be equals u2
   }
 }

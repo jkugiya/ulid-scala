@@ -23,7 +23,7 @@ object ULID {
     override final def generate(): ULID =
       new ULID(System.currentTimeMillis(), random)
 
-    override final def algorithm: String = random match {
+    override final def algorithm(): String = random match {
       case sr: SecureRandom => sr.getAlgorithm
       case _ => random.getClass.toString
     }
@@ -98,5 +98,13 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
     originalRandomness.copyToArray(value)
     value
   }
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: ULID =>
+      (time == other.time) && (originalRandomness == other.originalRandomness)
+    case _ =>
+      false
+  }
+
 }
 
