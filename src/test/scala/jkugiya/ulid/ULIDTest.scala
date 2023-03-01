@@ -81,20 +81,20 @@ class ULIDTest extends AnyFlatSpec with Matchers {
   "increment" should "increment randomness when randomness is not 0xFFFF_FFFF_FFFF_FFFF_FFFF" in {
     val ulid = new ULID(
       System.currentTimeMillis(),
-      ByteBuffer.allocate(10).putShort(0xFFFF.toShort).putLong(0xFFFF_FFFF_FFFF_FFFDL).array()
+      ByteBuffer.allocate(10).putShort(-1 /* 0xFFFF */).putLong(-3 /* 0xFFFF_FFFF_FFFF_FFFD*/).array()
     )
-    ulid.increment().randomness shouldBe ByteBuffer.allocate(10).putShort(0xFFFF.toShort).putLong(0xFFFF_FFFF_FFFF_FFFEL).array()
-    ulid.increment().increment().randomness shouldBe ByteBuffer.allocate(10).putShort(0xFFFF.toShort).putLong(0xFFFF_FFFF_FFFF_FFFFL).array()
+    ulid.increment().randomness shouldBe ByteBuffer.allocate(10).putShort(-1).putLong(-2).array()
+    ulid.increment().increment().randomness shouldBe ByteBuffer.allocate(10).putShort(-1).putLong(-1/* 0xFFFF_FFFF_FFFF_FFFF */).array()
     val ulid2 = new ULID(
       System.currentTimeMillis(),
-      ByteBuffer.allocate(10).putShort(0xFFFE.toShort).putLong(0xFFFF_FFFF_FFFF_FFFFL).array()
+      ByteBuffer.allocate(10).putShort(-2/* 0xFFFE */).putLong(-1).array()
     )
-    ulid2.increment().randomness shouldBe ByteBuffer.allocate(10).putShort(0xFFFF.toShort).putLong(0L).array()
+    ulid2.increment().randomness shouldBe ByteBuffer.allocate(10).putShort(-1).putLong(0L).array()
   }
   it should "wraparound when randomness is 0xFFFF_FFFF_FFFF_FFFF_FFFF" in {
     val ulid = new ULID(
       System.currentTimeMillis(),
-      ByteBuffer.allocate(10).putShort(0xFFFF.toShort).putLong(0xFFFF_FFFF_FFFF_FFFFL).array()
+      ByteBuffer.allocate(10).putShort(-1).putLong(-1).array()
     )
     intercept[UnsupportedOperationException] {
       ulid.increment(wraparound = false).randomness

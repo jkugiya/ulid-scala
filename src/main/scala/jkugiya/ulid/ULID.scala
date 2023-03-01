@@ -109,7 +109,7 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
     val bf = ByteBuffer.wrap(randomness)
     val msb = bf.getShort
     val lsb = bf.getLong
-    if (lsb != 0xFFFF_FFFF_FFFF_FFFFL) {
+    if (lsb != -1L/* 0xFFFF_FFFF_FFFF_FFFF*/) {
       val newBf = ByteBuffer.allocate(10)
       val newRandomNess = newBf.putShort(msb).putLong(lsb + 1).array()
       new ULID(time, newRandomNess)
