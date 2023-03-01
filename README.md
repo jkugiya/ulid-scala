@@ -35,7 +35,7 @@ val binary: Array[Byte] = generator.binary()
 ```
 
 ### Monotonicity
-Monotonicity is not directly supported in `ulid-scala`.
+Complete [monotonicity](https://github.com/ulid/spec#monotonicity) is not directly supported in `ulid-scala`.
 However, it does have the ability to increase randomness within the same timestamp.
 
 ```scala
