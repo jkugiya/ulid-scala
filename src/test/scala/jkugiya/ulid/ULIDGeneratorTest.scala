@@ -1,10 +1,11 @@
 package jkugiya.ulid
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+
 import java.security.SecureRandom
 
-import org.scalatest.{ FlatSpec, Matchers }
-
-class ULIDGeneratorTest extends FlatSpec with Matchers {
+class ULIDGeneratorTest extends AnyFlatSpec with Matchers {
 
   it should "be able to specify algorithm" in {
     // Secure Random

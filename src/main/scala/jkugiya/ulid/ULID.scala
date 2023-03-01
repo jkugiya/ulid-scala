@@ -101,7 +101,7 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
 
   override def equals(obj: Any): Boolean = obj match {
     case other: ULID =>
-      (time == other.time) && (originalRandomness == other.originalRandomness)
+      (time == other.time) && (originalRandomness sameElements other.originalRandomness)
     case _ =>
       false
   }
