@@ -1,10 +1,10 @@
 package jkugiya.ulid
 
-import java.security.SecureRandom
-import java.util.{UUID, Random => JRandom}
-
 import jkugiya.ulid.ULID._
 
+import java.nio.ByteBuffer
+import java.security.SecureRandom
+import java.util.{UUID, Random => JRandom}
 import scala.util.Try
 
 object ULID {
@@ -97,6 +97,31 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
     val value = new Array[Byte](RandomnessSize)
     originalRandomness.copyToArray(value)
     value
+  }
+
+  /**
+   * Increments randomness.
+   * (For more information on the the terms, please refer [[https://github.com/ulid/spec#specification specification]].)
+   * @param wraparound if `true`, randomness wraparound when overflowing. Default is `true`.
+   * @return uild with increased randomness
+   */
+  def increment(wraparound: Boolean = true): ULID = {
+    val bf = ByteBuffer.wrap(randomness)
+    val msb = bf.getShort
+    val lsb = bf.getLong
+    if (lsb != 0xFFFF_FFFF_FFFF_FFFFL) {
+      val newBf = ByteBuffer.allocate(10)
+      val newRandomNess = newBf.putShort(msb).putLong(lsb + 1).array()
+      new ULID(time, newRandomNess)
+    } else if (msb != -1 /** 0xFFFF */) {
+      val newBf = ByteBuffer.allocate(10)
+      val newRandomNess = newBf.putShort((msb + 1).toShort).putLong(0).array()
+      new ULID(time, newRandomNess)
+    } else if (wraparound) {
+      new ULID(time, new Array[Byte](10))
+    } else {
+      throw new UnsupportedOperationException("Randomness of ULID has overflowed.")
+    }
   }
 
   override def equals(obj: Any): Boolean = obj match {
