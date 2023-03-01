@@ -3,6 +3,7 @@ package jkugiya.ulid
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.nio.ByteBuffer
 import java.util.UUID
 import scala.annotation.tailrec
 import scala.util.Random
@@ -77,19 +78,42 @@ class ULIDTest extends AnyFlatSpec with Matchers {
       case (l, r) => l shouldBe r
     }
   }
-  it should "not decode invalid character" in {
+  "increment" should "increment randomness when randomness is not 0xFFFF_FFFF_FFFF_FFFF_FFFF" in {
+    val ulid = new ULID(
+      System.currentTimeMillis(),
+      ByteBuffer.allocate(10).putShort(-1 /* 0xFFFF */).putLong(-3 /* 0xFFFF_FFFF_FFFF_FFFD*/).array()
+    )
+    ulid.increment().randomness shouldBe ByteBuffer.allocate(10).putShort(-1).putLong(-2).array()
+    ulid.increment().increment().randomness shouldBe ByteBuffer.allocate(10).putShort(-1).putLong(-1/* 0xFFFF_FFFF_FFFF_FFFF */).array()
+    val ulid2 = new ULID(
+      System.currentTimeMillis(),
+      ByteBuffer.allocate(10).putShort(-2/* 0xFFFE */).putLong(-1).array()
+    )
+    ulid2.increment().randomness shouldBe ByteBuffer.allocate(10).putShort(-1).putLong(0L).array()
+  }
+  it should "wraparound when randomness is 0xFFFF_FFFF_FFFF_FFFF_FFFF" in {
+    val ulid = new ULID(
+      System.currentTimeMillis(),
+      ByteBuffer.allocate(10).putShort(-1).putLong(-1).array()
+    )
+    intercept[UnsupportedOperationException] {
+      ulid.increment(wraparound = false).randomness
+    }
+    ulid.increment().randomness shouldBe new Array[Byte](10)
+  }
+  "fromBase32" should "not decode invalid character" in {
     an[IllegalArgumentException] should be thrownBy ULID.fromBase32("abc")
     an[IllegalArgumentException] should be thrownBy ULID.fromBase32("=" * 26)
   }
-  it should "not decode invalid binary" in {
+  "fromBinary" should "not decode invalid binary" in {
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](0))
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](15))
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](17))
   }
-  it should "support equals" in {
+  "ULID" should "support equals" in {
     val uuid = UUID.randomUUID()
     val u1 = ULID.fromUUID(uuid)
     val u2 = ULID.fromUUID(uuid)
-    (u1.equals(u2)) shouldBe true
+    (u1 == u2) shouldBe true
   }
 }
