@@ -1,12 +1,13 @@
 package jkugiya.ulid
 
-
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import java.util.UUID
+import scala.annotation.tailrec
 import scala.util.Random
 
-class ULIDTest extends FlatSpec with Matchers {
+class ULIDTest extends AnyFlatSpec with Matchers {
 
   def ulid(timestamp: Long, randomness: Array[Byte]): ULID =
     new ULID(timestamp, randomness)
@@ -16,6 +17,8 @@ class ULIDTest extends FlatSpec with Matchers {
     Random.nextBytes(bytes)
     bytes
   }
+
+  @tailrec
   private def nextLong(): Long = {
     val value = Random.nextLong()
     if (value < 0 || value >= ULID.MaxTimestamp) nextLong()
@@ -38,8 +41,8 @@ class ULIDTest extends FlatSpec with Matchers {
       val timestamp = System.currentTimeMillis()
       val randomness = nextBytes()
       val base32 = ulid(timestamp, randomness).base32
-      base32 shouldBe (Base32Logics.logic1(timestamp, randomness))
-      base32 shouldBe (Base32Logics.logic2(timestamp, randomness))
+      base32 shouldBe Base32Logics.logic1(timestamp, randomness)
+      base32 shouldBe Base32Logics.logic2(timestamp, randomness)
     }
   }
   it should "be failed" in {
@@ -52,26 +55,26 @@ class ULIDTest extends FlatSpec with Matchers {
     val gen = ULID.getGenerator()
     val base32 = gen.base32()
     val decoded = ULID.fromBase32(base32)
-    base32 shouldBe(decoded.base32)
+    base32 shouldBe decoded.base32
   }
   "generated UUID" should "be equal to decoded value" in {
     val gen = ULID.getGenerator()
     val uuid = gen.uuid()
     val decoded = ULID.fromUUID(uuid)
-    uuid shouldBe(decoded.uuid)
+    uuid shouldBe decoded.uuid
   }
   "generated binary" should "be equal to decoded value" in {
     val gen = ULID.getGenerator()
     val binary = gen.binary()
     val decoded = ULID.fromBinary(binary)
-    binary shouldBe(decoded.binary)
+    binary shouldBe decoded.binary
   }
 
   "randomness" should "be copied original" in {
     val gen = ULID.getGenerator()
     val uuid = gen.generate()
     (uuid.originalRandomness zip uuid.randomness).foreach {
-      case (l, r) => l shouldBe(r)
+      case (l, r) => l shouldBe r
     }
   }
   it should "not decode invalid character" in {
@@ -87,6 +90,6 @@ class ULIDTest extends FlatSpec with Matchers {
     val uuid = UUID.randomUUID()
     val u1 = ULID.fromUUID(uuid)
     val u2 = ULID.fromUUID(uuid)
-    u1 should be equals u2
+    (u1.equals(u2)) shouldBe true
   }
 }

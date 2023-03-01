@@ -1,7 +1,7 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.13.4"
-ThisBuild / crossScalaVersions := Seq("2.13.4", "2.12.13", "2.11.12")
+ThisBuild / scalaVersion     := "3.2.2"
+ThisBuild / crossScalaVersions := Seq("3.2.2", "2.13.10", "2.12.17", "2.11.12")
 ThisBuild / version          := "1.0.3-SNAPSHOT"
 ThisBuild / organization     := "com.github.jkugiya"
 ThisBuild / organizationName := "jkugiya"
