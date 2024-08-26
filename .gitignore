@@ -1,4 +1,13 @@
 .idea/
 target/
-.bsp
+/.bsp
+# SBT cross compilation targets
+/.js
+/.jvm
+/.native
+# Metals files
+.bloop
+/.metals
+metals.sbt
+
 null
