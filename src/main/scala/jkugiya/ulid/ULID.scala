@@ -51,7 +51,7 @@ object ULID {
 
 }
 
-private[ulid] trait ULIDGenerator {
+trait ULIDGenerator {
 
   def generate(): ULID
 
