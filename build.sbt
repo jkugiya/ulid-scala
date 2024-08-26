@@ -1,18 +1,12 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "3.3.3"
-ThisBuild / crossScalaVersions := Seq("3.3.3", "2.13.14", "2.12.19", "2.11.12")
-ThisBuild / version          := "1.0.4-SNAPSHOT"
+ThisBuild / scalaVersion     := "3.2.2"
+ThisBuild / crossScalaVersions := Seq("3.2.2", "2.13.10", "2.12.17", "2.11.12")
+ThisBuild / version          := "1.0.3-SNAPSHOT"
 ThisBuild / organization     := "com.github.jkugiya"
 ThisBuild / organizationName := "jkugiya"
 
-lazy val root = 
-  (
-    crossProject(JVMPlatform, JSPlatform, NativePlatform)
-      .withoutSuffixFor(JVMPlatform)
-      .crossType(CrossType.Pure)
-      .in(file("."))
-  )
+lazy val root = (project in file("."))
   .settings(
     name := "ulid-scala",
     libraryDependencies += scalaTest % Test
@@ -26,13 +20,13 @@ lazy val benchmark = (project in file("benchmark"))
       "io.azam.ulidj" % "ulidj" % "1.0.0"
     )
   )
-  .dependsOn(root.jvm)
+  .dependsOn(root)
 
 // Uncomment the following for publishing to Sonatype.
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for more detail.
 
  ThisBuild / description := "A Scala port of alizain/ulid"
- ThisBuild / licenses    := List("MIT" -> new URI("https://github.com/jkugiya/ulid-scala/blob/master/LICENSE").toURL)
+ ThisBuild / licenses    := List("MIT" -> new URL("https://github.com/jkugiya/ulid-scala/blob/master/LICENSE"))
  ThisBuild / homepage    := Some(url("https://github.com/jkugiya/ulid-scala"))
  ThisBuild / scmInfo := Some(
    ScmInfo(
