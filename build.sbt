@@ -1,6 +1,7 @@
 import Dependencies._
 
 ThisBuild / scalaVersion     := "3.3.3"
+// Make sure to update .github/workflows/ci.yml when updating this list
 ThisBuild / crossScalaVersions := Seq("3.3.3", "2.13.14", "2.12.19", "2.11.12")
 ThisBuild / version          := "1.0.4-SNAPSHOT"
 ThisBuild / organization     := "com.github.jkugiya"
