@@ -3,7 +3,6 @@ package jkugiya.ulid
 import jkugiya.ulid.ULID._
 
 import java.nio.ByteBuffer
-import java.security.SecureRandom
 import java.util.{UUID, Random => JRandom}
 import scala.util.Try
 
@@ -23,11 +22,7 @@ object ULID {
     override final def generate(): ULID =
       new ULID(System.currentTimeMillis(), random)
 
-    override final def algorithm(): String = random match {
-      case sr: SecureRandom => sr.getAlgorithm
-      case _ => random.getClass.toString
-    }
-
+    override final def algorithm(): String = SecureGenerator.algorithm(random)
   }
 
   def getGenerator(random: JRandom = SecureGenerator.get): ULIDGenerator =

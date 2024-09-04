@@ -11,4 +11,9 @@ private[ulid] object SecureGenerator {
       .recover({ case _ => new JRandom() })
       .get
   }
+
+  def algorithm(random: JRandom): String = random match {
+    case sr: SecureRandom => sr.getAlgorithm
+    case _ => random.getClass.toString
+  }
 }
