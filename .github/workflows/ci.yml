@@ -20,7 +20,7 @@ jobs:
       - name: Run tests
         run: sbt "++${{ matrix.scala }} test"
       - name: Run coverage (JVM only)
-        run: sbt coverage "++${{ matrix.scala }} root/test"
+        run: sbt coverage "++${{ matrix.scala }}; root/test"
       - name: Upload coverage data to Coveralls
         run: sbt ++${{ matrix.scala }} coverageReport coveralls
         env:
