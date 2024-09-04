@@ -1,5 +1,4 @@
 ThisBuild / scalaVersion     := "3.3.3"
-// Make sure to update .github/workflows/ci.yml when updating this list
 ThisBuild / crossScalaVersions := Seq("3.3.3", "2.13.14", "2.12.19")
 ThisBuild / version          := "1.0.4-SNAPSHOT"
 ThisBuild / organization     := "com.github.jkugiya"
@@ -25,13 +24,13 @@ lazy val benchmark = (project in file("benchmark"))
       "io.azam.ulidj" % "ulidj" % "1.0.0"
     )
   )
-  .dependsOn(root.jvm)
+  .dependsOn(root)
 
 // Uncomment the following for publishing to Sonatype.
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for more detail.
 
  ThisBuild / description := "A Scala port of alizain/ulid"
- ThisBuild / licenses    := List("MIT" -> new URI("https://github.com/jkugiya/ulid-scala/blob/master/LICENSE").toURL)
+ ThisBuild / licenses    := List("MIT" -> new URL("https://github.com/jkugiya/ulid-scala/blob/master/LICENSE"))
  ThisBuild / homepage    := Some(url("https://github.com/jkugiya/ulid-scala"))
  ThisBuild / scmInfo := Some(
    ScmInfo(
