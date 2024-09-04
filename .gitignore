@@ -1,4 +1,7 @@
 .idea/
 target/
 .bsp
+.metals
+.bloop
+metals.sbt
 null
