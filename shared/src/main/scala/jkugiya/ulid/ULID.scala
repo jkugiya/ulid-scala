@@ -112,12 +112,48 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
     }
   }
 
+  override def toString(): String = {
+    val sb = new StringBuilder
+    sb.append("ULID(b32=")
+    sb.append(base32)
+    sb.append(", uuid=")
+    sb.append(uuid)
+    sb.append(")")
+    sb.toString
+  }
+
   override def equals(obj: Any): Boolean = obj match {
     case other: ULID =>
-      (time == other.time) && (originalRandomness sameElements other.originalRandomness)
+      if (this eq other) return true
+      if (time != other.time) return false
+
+      {
+        var idx = 0
+        while (idx < originalRandomness.length) {
+          if (originalRandomness(idx) != other.originalRandomness(idx)) return false
+          idx += 1
+        }
+      }
+
+      true
     case _ =>
       false
   }
 
+  override def hashCode(): Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + time.hashCode
+
+    {
+      var idx = 0
+      while (idx < originalRandomness.length) {
+        result = prime * result + originalRandomness(idx)
+        idx += 1
+      }
+    }
+
+    result
+  }
 }
 
