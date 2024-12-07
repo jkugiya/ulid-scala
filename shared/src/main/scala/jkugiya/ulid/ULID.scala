@@ -3,7 +3,6 @@ package jkugiya.ulid
 import jkugiya.ulid.ULID._
 
 import java.nio.ByteBuffer
-import java.security.SecureRandom
 import java.util.{UUID, Random => JRandom}
 import scala.util.Try
 
@@ -23,21 +22,10 @@ object ULID {
     override final def generate(): ULID =
       new ULID(System.currentTimeMillis(), random)
 
-    override final def algorithm(): String = random match {
-      case sr: SecureRandom => sr.getAlgorithm
-      case _ => random.getClass.toString
-    }
-
+    override final def algorithm(): String = SecureGenerator.algorithm(random)
   }
 
-  private[this] def secureGenerator = {
-    Try(SecureRandom.getInstance("NativePRNGNonBlocking"))
-      .recover({ case _ => SecureRandom.getInstanceStrong })
-      .recover({ case _ => new JRandom() })
-      .get
-  }
-
-  def getGenerator(random: JRandom = secureGenerator): ULIDGenerator =
+  def getGenerator(random: JRandom = SecureGenerator.get): ULIDGenerator =
     new StatefulGenerator(random)
 
   def fromBase32(base32: String): ULID =
@@ -124,12 +112,48 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
     }
   }
 
+  override def toString(): String = {
+    val sb = new StringBuilder
+    sb.append("ULID(b32=")
+    sb.append(base32)
+    sb.append(", uuid=")
+    sb.append(uuid)
+    sb.append(")")
+    sb.toString
+  }
+
   override def equals(obj: Any): Boolean = obj match {
     case other: ULID =>
-      (time == other.time) && (originalRandomness sameElements other.originalRandomness)
+      if (this eq other) return true
+      if (time != other.time) return false
+
+      {
+        var idx = 0
+        while (idx < originalRandomness.length) {
+          if (originalRandomness(idx) != other.originalRandomness(idx)) return false
+          idx += 1
+        }
+      }
+
+      true
     case _ =>
       false
   }
 
+  override def hashCode(): Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + time.hashCode
+
+    {
+      var idx = 0
+      while (idx < originalRandomness.length) {
+        result = prime * result + originalRandomness(idx)
+        idx += 1
+      }
+    }
+
+    result
+  }
 }
 

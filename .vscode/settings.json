@@ -1,0 +1,8 @@
+{
+    "files.watcherExclude": {
+        "**/target": true
+    },
+    "java.project.sourcePaths": [
+        "jvm"
+    ]
+}

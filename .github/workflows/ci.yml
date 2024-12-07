@@ -8,6 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Make sure to update build.sbt when updating this list
         scala: [ 3.3.3, 2.13.14, 2.12.19 ]
     steps:
       - name: Checkout
@@ -17,9 +18,11 @@ jobs:
         with:
           java-version: "adopt@1.11"
       - name: Run tests
-        run: sbt coverage "++${{ matrix.scala }} test"
+        run: sbt "++${{ matrix.scala }} test"
+      - name: Run coverage (JVM only)
+        run: sbt coverage "++${{ matrix.scala }}; root/test"
       - name: Upload coverage data to Coveralls
-        run: sbt ++${{ matrix.scala }} coverageReport coveralls
+        run: sbt ++${{ matrix.scala }} coverageAggregate coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_FLAG_NAME: Scala ${{ matrix.scala }}

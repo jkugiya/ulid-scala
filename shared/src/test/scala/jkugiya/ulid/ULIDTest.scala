@@ -4,7 +4,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.nio.ByteBuffer
-import java.util.UUID
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -111,7 +110,7 @@ class ULIDTest extends AnyFlatSpec with Matchers {
     an[IllegalArgumentException] should be thrownBy ULID.fromBinary(new Array[Byte](17))
   }
   "ULID" should "support equals" in {
-    val uuid = UUID.randomUUID()
+    val uuid = RandomUUID()
     val u1 = ULID.fromUUID(uuid)
     val u2 = ULID.fromUUID(uuid)
     (u1 == u2) shouldBe true
