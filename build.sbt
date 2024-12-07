@@ -1,7 +1,7 @@
 ThisBuild / scalaVersion     := "3.3.3"
 // Make sure to update .github/workflows/ci.yml when updating this list
 ThisBuild / crossScalaVersions := Seq("3.3.3", "2.13.14", "2.12.19")
-ThisBuild / version          := "1.0.5-SNAPSHOT"
+ThisBuild / version          := "1.0.6-SNAPSHOT"
 ThisBuild / organization     := "com.github.jkugiya"
 ThisBuild / organizationName := "jkugiya"
 
@@ -20,6 +20,7 @@ lazy val root =
 lazy val benchmark = (project in file("benchmark"))
   .enablePlugins(JmhPlugin)
   .settings(
+    publish / skip := true,
     libraryDependencies ++= Seq(
       "de.huxhorn.sulky" % "de.huxhorn.sulky.ulid" % "8.2.0",
       "io.azam.ulidj" % "ulidj" % "1.0.0"
