@@ -13,10 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+      - uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
+          java-version: 11
+          distribution: adopt
+      - uses: sbt/setup-sbt@v1
       - name: Run tests
         run: sbt "++${{ matrix.scala }} test"
       - name: Run coverage (JVM only)
