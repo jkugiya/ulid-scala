@@ -3,16 +3,14 @@ package jkugiya.ulid
 import jkugiya.ulid.ULID._
 
 import java.nio.ByteBuffer
+import java.util
 import java.util.{Arrays, UUID, Random => JRandom}
-import scala.util.Try
 
 object ULID {
 
   private[ulid] val RandomnessSize = 10
 
   private[ulid] val ByteLengthOfULID = 16
-
-  private[ulid] val ByteLengthOfLong = 8
 
   private[ulid] val MaxTimestamp = 281474976710655L
   private[ulid] val MinTimestamp = 0L
@@ -90,6 +88,7 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
   /**
    * Increments randomness.
    * (For more information on the the terms, please refer [[https://github.com/ulid/spec#specification specification]].)
+   *
    * @param wraparound if `true`, randomness wraparound when overflowing. Default is `true`.
    * @return uild with increased randomness
    */
@@ -97,11 +96,11 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
     val bf = ByteBuffer.wrap(randomness)
     val msb = bf.getShort
     val lsb = bf.getLong
-    if (lsb != -1L/* 0xFFFF_FFFF_FFFF_FFFF*/) {
+    if (lsb != -1L) { // 0xFFFF_FFFF_FFFF_FFFF
       val newBf = ByteBuffer.allocate(10)
       val newRandomNess = newBf.putShort(msb).putLong(lsb + 1).array()
       new ULID(time, newRandomNess)
-    } else if (msb != -1 /** 0xFFFF */) {
+    } else if (msb != -1) { // OxFFFF
       val newBf = ByteBuffer.allocate(10)
       val newRandomNess = newBf.putShort((msb + 1).toShort).putLong(0).array()
       new ULID(time, newRandomNess)
@@ -124,10 +123,8 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
 
   override def equals(obj: Any): Boolean = obj match {
     case other: ULID =>
-      if (this eq other) return true
-      if (time != other.time) return false
-
-      Arrays.equals(this.originalRandomness, other.originalRandomness)
+      (this eq other) ||
+        (time == other.time) && util.Arrays.equals(this.originalRandomness, other.originalRandomness)
     case _ =>
       false
   }
