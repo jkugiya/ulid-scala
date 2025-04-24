@@ -3,7 +3,7 @@ package jkugiya.ulid
 import jkugiya.ulid.ULID._
 
 import java.nio.ByteBuffer
-import java.util.{UUID, Random => JRandom}
+import java.util.{Arrays, UUID, Random => JRandom}
 import scala.util.Try
 
 object ULID {
@@ -127,15 +127,7 @@ class ULID private[ulid](val time: Long, private[ulid] val originalRandomness: A
       if (this eq other) return true
       if (time != other.time) return false
 
-      {
-        var idx = 0
-        while (idx < originalRandomness.length) {
-          if (originalRandomness(idx) != other.originalRandomness(idx)) return false
-          idx += 1
-        }
-      }
-
-      true
+      Arrays.equals(this.originalRandomness, other.originalRandomness)
     case _ =>
       false
   }
